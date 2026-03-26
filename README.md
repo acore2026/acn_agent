@@ -32,6 +32,7 @@ acn_agent/
 │   └── webui_mock.py
 ├── scripts/
 │   └── start_acn_agent.sh
+├── acn_agent.py
 ├── message.txt
 ├── pyproject.toml
 └── requirements.txt
@@ -89,6 +90,11 @@ chmod +x scripts/start_acn_agent.sh
 ./scripts/start_acn_agent.sh
 ```
 
+也可以直接运行：
+```bash
+python3 acn_agent.py
+```
+
 ## 6. 测试说明
 测试使用桩传输模拟 IDM、AgentGW、WebUI，不开发其他系统组件，覆盖：
 - IDM 转发
@@ -108,4 +114,10 @@ pytest
 - `mocks/webui_mock.py`
 - `mocks/acn_sdk_mock.py`
 
-可直接用 `uvicorn` 或 `python -m` 启动这些 mock 程序。
+推荐直接使用：
+```bash
+python3 mocks/idm_mock.py
+python3 mocks/agent_gw_mock.py
+python3 mocks/webui_mock.py
+python3 mocks/acn_sdk_mock.py demo
+```

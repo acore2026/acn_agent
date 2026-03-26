@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uvicorn
 from fastapi import FastAPI
 
 from acn_agent.api.routes import router
@@ -44,3 +45,19 @@ def create_app(
 
 
 app = create_app()
+
+
+def main() -> None:
+    """Run the ACN Agent application server."""
+    settings = get_settings()
+    uvicorn.run(
+        "acn_agent.main:app",
+        host=settings.app_host,
+        port=settings.app_port,
+        log_level=settings.log_level.lower(),
+        reload=False,
+    )
+
+
+if __name__ == "__main__":
+    main()

@@ -40,6 +40,11 @@ chmod +x scripts/start_acn_agent.sh
 
 手动启动：
 ```bash
+python3 acn_agent.py
+```
+
+或：
+```bash
 uvicorn acn_agent.main:app --host 0.0.0.0 --port 9010
 ```
 
@@ -61,4 +66,11 @@ pytest
 - `mocks/webui_mock.py`
 - `mocks/acn_sdk_mock.py`
 
-可按需用 `uvicorn` 或 `python -m` 直接运行。
+也可以直接使用统一入口：
+
+```bash
+python3 mocks/idm_mock.py
+python3 mocks/agent_gw_mock.py
+python3 mocks/webui_mock.py
+python3 mocks/acn_sdk_mock.py demo
+```

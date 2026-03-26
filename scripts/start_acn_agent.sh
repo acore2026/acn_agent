@@ -13,4 +13,12 @@ python -m pip install --upgrade pip
 python -m pip install -r "${ROOT_DIR}/requirements.txt"
 
 export PYTHONPATH="${ROOT_DIR}:${PYTHONPATH:-}"
-exec uvicorn acn_agent.main:app --host "${ACN_AGENT_APP_HOST:-0.0.0.0}" --port "${ACN_AGENT_APP_PORT:-9010}"
+
+EXISTING_PIDS="$(pgrep -f "python3 ${ROOT_DIR}/acn_agent.py" || true)"
+if [[ -n "${EXISTING_PIDS}" ]]; then
+  echo "Stopping existing ACN Agent process: ${EXISTING_PIDS}"
+  kill ${EXISTING_PIDS}
+  sleep 1
+fi
+
+exec python3 "${ROOT_DIR}/acn_agent.py"

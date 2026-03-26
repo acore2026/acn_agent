@@ -1,9 +1,15 @@
 from __future__ import annotations
 
 import logging
+import os
+import sys
 from typing import Any
 
+import uvicorn
 from fastapi import FastAPI, Request
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from mocks.common import utc_now_iso
 
@@ -80,3 +86,12 @@ async def task_execution_terminations(request: Request) -> dict[str, Any]:
 async def mock_state() -> dict[str, Any]:
     """Return captured request state."""
     return STATE
+
+
+def main() -> None:
+    """Run AgentGW mock with python3 mocks/agent_gw_mock.py."""
+    uvicorn.run(app, host="127.0.0.1", port=9001, log_level="info")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,9 +1,15 @@
 from __future__ import annotations
 
 import logging
+import os
+import sys
 from typing import Any
 
+import uvicorn
 from fastapi import FastAPI, Request
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 logging.basicConfig(
     level=logging.INFO,
@@ -46,3 +52,12 @@ async def clear_pipeline_logs() -> dict[str, Any]:
     count = len(PIPELINE_LOGS)
     PIPELINE_LOGS.clear()
     return {"result": "success", "cleared": count}
+
+
+def main() -> None:
+    """Run WebUI mock with python3 mocks/webui_mock.py."""
+    uvicorn.run(app, host="127.0.0.1", port=9005, log_level="info")
+
+
+if __name__ == "__main__":
+    main()
