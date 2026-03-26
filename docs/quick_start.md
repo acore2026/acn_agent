@@ -67,7 +67,7 @@ chmod +x scripts/build_acn_agent.sh
 
 输出文件：
 ```text
-dist/acn-agent
+dist/acn_agent
 ```
 
 ## 7. Mock 组件说明

@@ -117,7 +117,7 @@ chmod +x scripts/build_acn_agent.sh
 
 生成后的文件路径：
 ```text
-dist/acn-agent
+dist/acn_agent
 ```
 
 ## 8. Mock 组件
