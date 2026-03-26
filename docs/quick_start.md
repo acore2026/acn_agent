@@ -59,7 +59,18 @@ PyCharm 启动建议：
 pytest
 ```
 
-## 6. Mock 组件说明
+## 6. 生成可执行文件
+```bash
+chmod +x scripts/build_acn_agent.sh
+./scripts/build_acn_agent.sh
+```
+
+输出文件：
+```text
+dist/acn-agent
+```
+
+## 7. Mock 组件说明
 仓库内置了以下 mock Python 程序，供本地联调使用：
 - `mocks/idm_mock.py`
 - `mocks/agent_gw_mock.py`

@@ -30,6 +30,7 @@ acn_agent/
 │   ├── idm_mock.py
 │   └── webui_mock.py
 ├── scripts/
+│   ├── build_acn_agent.sh
 │   └── start_acn_agent.sh
 ├── acn_agent.py
 ├── message.txt
@@ -107,7 +108,19 @@ python3 acn_agent.py
 pytest
 ```
 
-## 7. Mock 组件
+## 7. 可执行文件生成
+可执行文件构建脚本：
+```bash
+chmod +x scripts/build_acn_agent.sh
+./scripts/build_acn_agent.sh
+```
+
+生成后的文件路径：
+```text
+dist/acn-agent
+```
+
+## 8. Mock 组件
 已提供以下模拟程序用于本地测试 ACN Agent：
 - `mocks/idm_mock.py`
 - `mocks/agent_gw_mock.py`
