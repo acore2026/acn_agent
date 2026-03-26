@@ -14,7 +14,6 @@ acn_agent/
 │   ├── services/
 │   │   ├── agent_service.py
 │   │   ├── http_forwarder.py
-│   │   ├── metrics.py
 │   │   ├── pipeline_logger.py
 │   │   └── state_store.py
 │   ├── tests/
@@ -46,6 +45,7 @@ acn_agent/
 - 根据接口路径转发消息到 IDM(`9020`) 或 AgentGW(`9001`)
 - 原样返回上游响应给 ACN SDK
 - 处理 WebUI 的 `/clear` 请求，清理本地记录与打点
+- 处理 WebUI 的 `/clear` 请求，清理本地记录
 - 关键消息收发、状态变化、转发结果全部通过 `logging` 记录
 - 通过内存状态存储保存请求记录和流水日志，便于联调与扩展
 - IDM、AgentGW、WebUI 的 IP 地址在代码中固定定义，默认使用本机 `127.0.0.1`

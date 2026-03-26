@@ -9,7 +9,6 @@ import httpx
 from acn_agent.core.config import Settings
 from acn_agent.models.common import ClearResponse, ProxyRecord
 from acn_agent.services.http_forwarder import HTTPForwarder
-from acn_agent.services.metrics import MetricsRegistry
 from acn_agent.services.pipeline_logger import PipelineLogger
 from acn_agent.services.state_store import StateStore
 
@@ -29,13 +28,11 @@ class AgentService:
         self,
         settings: Settings,
         store: StateStore,
-        metrics: MetricsRegistry,
         forwarder: HTTPForwarder,
         pipeline_logger: PipelineLogger,
     ) -> None:
         self._settings = settings
         self._store = store
-        self._metrics = metrics
         self._forwarder = forwarder
         self._pipeline_logger = pipeline_logger
         self._logger = logging.getLogger(self.__class__.__name__)
@@ -67,7 +64,6 @@ class AgentService:
         """Forward one ACN SDK request to the mapped upstream."""
         target = self.resolve_target(path)
         self._logger.info("接收到ACN SDK请求 path=%s upstream=%s body=%s", path, target.upstream_name, payload)
-        self._metrics.increment(f"request.received:{path}")
         await self._pipeline_logger.emit(
             source="ACN SDK",
             destination="ACN Agent",
@@ -81,7 +77,6 @@ class AgentService:
             response = await self._forwarder.post_json(target.upstream_url, payload, headers=headers)
             response_body = self._parse_response(response)
         except httpx.HTTPError as exc:
-            self._metrics.increment(f"request.failed:{path}")
             self._logger.exception("上游转发失败 path=%s error=%s", path, exc)
             await self._pipeline_logger.emit(
                 source="ACN Agent",
@@ -92,7 +87,6 @@ class AgentService:
             )
             raise
 
-        self._metrics.increment(f"request.succeeded:{path}")
         self._store.add_record(
             ProxyRecord(
                 path=path,
@@ -131,7 +125,6 @@ class AgentService:
         """Clear local runtime state."""
         self._logger.info("收到WebUI清除请求，开始清理本地状态")
         records_count, log_count = self._store.clear()
-        self._metrics.reset()
         self._logger.info("本地状态已清理 cleared_records=%s cleared_pipeline_logs=%s", records_count, log_count)
         return ClearResponse(
             message="本地状态清理完成",

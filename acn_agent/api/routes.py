@@ -23,7 +23,6 @@ async def health(request: Request) -> dict[str, Any]:
     return {
         "status": "ok",
         "service": request.app.title,
-        "metrics": request.app.state.metrics.snapshot(),
     }
 
 

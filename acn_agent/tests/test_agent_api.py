@@ -104,11 +104,11 @@ def test_clear_clears_local_state(test_app: tuple[Any, RecordingTransport]) -> N
     assert response.json()["cleared_pipeline_logs"] >= 1
 
 
-def test_health_metrics(test_app: tuple[Any, RecordingTransport]) -> None:
+def test_health(test_app: tuple[Any, RecordingTransport]) -> None:
     app, _ = test_app
     asyncio.run(post_json(app, "/idm/v1/identity-applications", {"owner": "alice"}))
     response = asyncio.run(get_json(app, "/health"))
 
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
-    assert response.json()["metrics"]["request.received:/idm/v1/identity-applications"] == 1
+    assert response.json()["service"] == "ACN Agent"

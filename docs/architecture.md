@@ -41,8 +41,6 @@ flowchart LR
   负责流水日志本地保存，并按需上报给 WebUI。
 - `acn_agent/services/state_store.py`
   负责本地内存状态保存，用于 clear 清理和调试追踪。
-- `acn_agent/services/metrics.py`
-  负责轻量级打点统计。
 
 ## 4. 请求时序
 ```mermaid
@@ -53,7 +51,7 @@ sequenceDiagram
     participant UI as WebUI
 
     SDK->>Agent: POST 业务请求
-    Agent->>Agent: 记录接收日志、计数器
+    Agent->>Agent: 记录接收日志
     Agent->>UI: POST /acn/v3/pipeline-logs
     Agent->>Upstream: 转发原始请求
     Upstream-->>Agent: 返回响应
@@ -69,4 +67,3 @@ sequenceDiagram
 ## 6. 可扩展点
 - 新增转发消息类型时，只需扩展 `AgentService.resolve_target`
 - 可在 `HTTPForwarder` 中引入超时重试、签名透传、统一鉴权
-- 可将 `MetricsRegistry` 替换为 Prometheus/OpenTelemetry
