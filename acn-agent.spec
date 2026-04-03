@@ -1,13 +1,16 @@
 # -*- mode: python ; coding: utf-8 -*-
+from pathlib import Path
+
 from PyInstaller.utils.hooks import collect_submodules
 
 hiddenimports = []
 hiddenimports += collect_submodules('acn_agent')
 
+ROOT_DIR = Path.cwd()
 
 a = Analysis(
     ['acn_agent.py'],
-    pathex=['/home/acn/cxr/acn_agent'],
+    pathex=[str(ROOT_DIR)],
     binaries=[],
     datas=[],
     hiddenimports=hiddenimports,
@@ -26,7 +29,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='acn-agent',
+    name='acn_agent',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

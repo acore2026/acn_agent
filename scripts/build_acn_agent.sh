@@ -21,10 +21,6 @@ cd "${ROOT_DIR}"
 rm -rf build dist
 
 "${PYTHON_BIN}" -m PyInstaller \
-  --onefile \
-  --name acn_agent \
-  --paths "${ROOT_DIR}" \
-  --collect-submodules acn_agent \
-  acn_agent.py
+  acn-agent.spec
 
 echo "Executable generated: ${ROOT_DIR}/dist/acn_agent"

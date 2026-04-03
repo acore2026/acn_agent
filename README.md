@@ -30,8 +30,8 @@ acn_agent/
 │   ├── idm_mock.py
 │   └── webui_mock.py
 ├── scripts/
-│   ├── build_acn_agent.sh
-│   └── start_acn_agent.sh
+│   └── build_acn_agent.sh
+├── start_acn_agent.sh
 ├── acn_agent.py
 ├── message.txt
 ├── pyproject.toml
@@ -81,14 +81,14 @@ sequenceDiagram
 
 ## 5. 启动方式
 详见：
-- [快速启动文档](/home/acn/cxr/acn_agent/docs/quick_start.md)
-- [系统架构文档](/home/acn/cxr/acn_agent/docs/architecture.md)
-- [接口 API 文档](/home/acn/cxr/acn_agent/docs/api.md)
+- [快速启动文档](docs/quick_start.md)
+- [系统架构文档](docs/architecture.md)
+- [接口 API 文档](docs/api.md)
 
 Linux / Ubuntu 一键启动：
 ```bash
-chmod +x scripts/start_acn_agent.sh
-./scripts/start_acn_agent.sh
+chmod +x start_acn_agent.sh
+./start_acn_agent.sh
 ```
 
 也可以直接运行：

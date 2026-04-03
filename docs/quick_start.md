@@ -20,7 +20,7 @@ pip install -r requirements.txt
 ```
 
 ## 3. 配置参数
-IDM、AgentGW、WebUI 的 IP 地址直接写在代码中，默认都是本机地址 `127.0.0.1`。如需修改，请直接编辑 [config.py](/home/acn/cxr/acn_agent/acn_agent/core/config.py) 中的 `Settings` 默认值。
+IDM、AgentGW、WebUI 的 IP 地址直接写在代码中，默认都是本机地址 `127.0.0.1`。如需修改，请直接编辑 [config.py](../acn_agent/core/config.py) 中的 `Settings` 默认值。
 
 默认配置如下：
 ```python
@@ -34,8 +34,8 @@ Settings(
 ## 4. 启动方式
 Linux / Ubuntu 一键启动：
 ```bash
-chmod +x scripts/start_acn_agent.sh
-./scripts/start_acn_agent.sh
+chmod +x start_acn_agent.sh
+./start_acn_agent.sh
 ```
 
 手动启动：
