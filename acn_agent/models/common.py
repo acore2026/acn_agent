@@ -43,3 +43,19 @@ class ClearResponse(BaseModel):
     message: str
     cleared_records: int
     cleared_pipeline_logs: int
+
+
+class OwnerAgent(BaseModel):
+    """One agent item returned by /acn-agent/v1/owner-agents."""
+
+    agent_id: str
+    agent_name: str
+    description: str
+
+
+class OwnerAgentsResponse(BaseModel):
+    """Response returned by /acn-agent/v1/owner-agents."""
+
+    owner: str
+    total: int
+    agents: list[OwnerAgent]

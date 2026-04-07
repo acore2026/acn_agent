@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from functools import lru_cache
+from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -20,6 +21,7 @@ class Settings:
     request_timeout_seconds: float = 10.0
     log_level: str = "INFO"
     enable_pipeline_log_push: bool = True
+    agent_db_path: str = str(Path(__file__).resolve().parents[2] / "acn_agent.db")
 
     def base_url(self, host: str, port: int) -> str:
         """Build a backend base URL."""

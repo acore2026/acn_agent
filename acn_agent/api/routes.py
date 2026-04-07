@@ -6,7 +6,7 @@ import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 
-from acn_agent.models.common import ClearResponse
+from acn_agent.models.common import ClearResponse, OwnerAgentsResponse
 from acn_agent.services.agent_service import AgentService
 
 router = APIRouter()
@@ -77,6 +77,22 @@ async def task_execution_terminations(
     return await _proxy(request, agent_service)
 
 
+@router.post("/acn-agent/v1/owner-agents", response_model=OwnerAgentsResponse)
+async def owner_agents(
+    request: Request,
+    agent_service: AgentService = Depends(get_agent_service),
+) -> OwnerAgentsResponse:
+    """Return local agents for the requested owner."""
+    payload = await request.json()
+    try:
+        return agent_service.get_owner_agents(payload)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+
+
 async def _proxy(request: Request, agent_service: AgentService) -> JSONResponse:
     """Shared proxy handler."""
     payload = await request.json()
@@ -93,5 +109,10 @@ async def _proxy(request: Request, agent_service: AgentService) -> JSONResponse:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=f"上游服务调用失败: {exc}",
+        ) from exc
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(exc),
         ) from exc
     return JSONResponse(status_code=status_code, content=response_body)

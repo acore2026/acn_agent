@@ -8,6 +8,7 @@ from acn_agent.core.config import Settings, get_settings
 from acn_agent.core.logging import configure_logging
 from acn_agent.services.agent_service import AgentService
 from acn_agent.services.http_forwarder import HTTPForwarder
+from acn_agent.services.agent_repository import AgentRepository
 from acn_agent.services.pipeline_logger import PipelineLogger
 from acn_agent.services.state_store import StateStore
 
@@ -20,6 +21,7 @@ def create_app(
     runtime_settings = settings or get_settings()
     configure_logging(runtime_settings.log_level)
     store = StateStore()
+    agent_repository = AgentRepository(runtime_settings.agent_db_path)
     forwarder = HTTPForwarder(
         timeout_seconds=runtime_settings.request_timeout_seconds,
         transport=transport,
@@ -33,6 +35,7 @@ def create_app(
     app.state.agent_service = AgentService(
         settings=runtime_settings,
         store=store,
+        agent_repository=agent_repository,
         forwarder=forwarder,
         pipeline_logger=pipeline_logger,
     )
