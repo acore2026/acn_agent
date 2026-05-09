@@ -27,7 +27,9 @@ async def health(request: Request) -> dict[str, Any]:
 
 
 @router.post("/clear", response_model=ClearResponse)
-async def clear_state(agent_service: AgentService = Depends(get_agent_service)) -> ClearResponse:
+async def clear_state(
+    agent_service: AgentService = Depends(get_agent_service),
+) -> ClearResponse:
     """Handle WebUI clear request."""
     return agent_service.clear_state()
 
@@ -74,6 +76,15 @@ async def task_execution_terminations(
     agent_service: AgentService = Depends(get_agent_service),
 ) -> JSONResponse:
     """Proxy task termination requests to AgentGW."""
+    return await _proxy(request, agent_service)
+
+
+@router.post("/acn-agent/v1/task-termination-broadcasts")
+async def task_termination_broadcasts(
+    request: Request,
+    agent_service: AgentService = Depends(get_agent_service),
+) -> JSONResponse:
+    """Proxy task termination broadcast requests to AgentGW."""
     return await _proxy(request, agent_service)
 
 

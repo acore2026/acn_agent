@@ -8,7 +8,12 @@ from typing import Any
 import httpx
 
 from acn_agent.core.config import Settings
-from acn_agent.models.common import ClearResponse, OwnerAgent, OwnerAgentsResponse, ProxyRecord
+from acn_agent.models.common import (
+    ClearResponse,
+    OwnerAgent,
+    OwnerAgentsResponse,
+    ProxyRecord,
+)
 from acn_agent.services.http_forwarder import HTTPForwarder
 from acn_agent.services.agent_repository import AgentRepository
 from acn_agent.services.pipeline_logger import PipelineLogger
@@ -52,6 +57,7 @@ class AgentService:
             "/arf/v1/agent-cards",
             "/acn-agent/v1/task-executions",
             "/acn-agent/v1/task-execution-terminations",
+            "/acn-agent/v1/task-termination-broadcasts",
         }:
             return RouteTarget(
                 upstream_name="AgentGW",
@@ -67,7 +73,12 @@ class AgentService:
     ) -> tuple[int, Any]:
         """Forward one ACN SDK request to the mapped upstream."""
         target = self.resolve_target(path)
-        self._logger.info("接收到ACN SDK请求 path=%s upstream=%s body=%s", path, target.upstream_name, payload)
+        self._logger.info(
+            "接收到ACN SDK请求 path=%s upstream=%s body=%s",
+            path,
+            target.upstream_name,
+            payload,
+        )
         await self._pipeline_logger.emit(
             source="ACN SDK",
             destination="ACN Agent",
@@ -78,7 +89,9 @@ class AgentService:
         )
 
         try:
-            response = await self._forwarder.post_json(target.upstream_url, payload, headers=headers)
+            response = await self._forwarder.post_json(
+                target.upstream_url, payload, headers=headers
+            )
             response_body = self._parse_response(response)
         except httpx.HTTPError as exc:
             self._logger.exception("上游转发失败 path=%s error=%s", path, exc)
@@ -123,7 +136,34 @@ class AgentService:
             abstract=f"{path}响应返回ACN SDK",
             task_id=self._extract_task_id(payload),
         )
-        self._sync_local_agent_state(path=path, payload=payload, response_status=response.status_code, response_body=response_body)
+        if path == "/acn-agent/v1/agent-deletions":
+            agent_gw_url = f"{self._settings.base_url(self._settings.agent_gw_host, self._settings.agent_gw_port)}{path}"
+            try:
+                agent_gw_response = await self._forwarder.post_json(
+                    agent_gw_url, payload, headers=headers
+                )
+                self._logger.info(
+                    "agent-deletions已直接转发到AgentGW url=%s status=%s",
+                    agent_gw_url,
+                    agent_gw_response.status_code,
+                )
+                await self._pipeline_logger.emit(
+                    source="ACN Agent",
+                    destination="AgentGW",
+                    content=payload,
+                    abstract=f"{path}已直接转发到AgentGW",
+                    task_id=self._extract_task_id(payload),
+                    headers=headers,
+                )
+            except httpx.HTTPError as exc:
+                self._logger.warning("agent-deletions转发到AgentGW失败 error=%s", exc)
+
+        self._sync_local_agent_state(
+            path=path,
+            payload=payload,
+            response_status=response.status_code,
+            response_body=response_body,
+        )
         return response.status_code, response_body
 
     def clear_state(self) -> ClearResponse:
@@ -131,7 +171,11 @@ class AgentService:
         self._logger.info("收到WebUI清除请求，开始清理本地状态")
         records_count, log_count = self._store.clear()
         deleted_agents = self._agent_repository.clear()
-        self._logger.info("本地状态已清理 cleared_records=%s cleared_pipeline_logs=%s", records_count, log_count)
+        self._logger.info(
+            "本地状态已清理 cleared_records=%s cleared_pipeline_logs=%s",
+            records_count,
+            log_count,
+        )
         self._logger.info("本地Agent表已清理 cleared_agents=%s", deleted_agents)
         return ClearResponse(
             message="本地状态清理完成",
@@ -182,7 +226,13 @@ class AgentService:
         body = payload.get("body")
         return body if isinstance(body, dict) else payload
 
-    def _sync_local_agent_state(self, path: str, payload: dict[str, Any], response_status: int, response_body: Any) -> None:
+    def _sync_local_agent_state(
+        self,
+        path: str,
+        payload: dict[str, Any],
+        response_status: int,
+        response_body: Any,
+    ) -> None:
         """Persist or delete local Agent rows after successful upstream processing."""
         if response_status < 200 or response_status >= 300:
             return
@@ -193,7 +243,11 @@ class AgentService:
                 owner = body.get("owner")
                 agent_name = body.get("name") or body.get("agent_name")
                 description = body.get("description", "")
-                agent_id = response_body.get("agent_id") if isinstance(response_body, dict) else None
+                agent_id = (
+                    response_body.get("agent_id")
+                    if isinstance(response_body, dict)
+                    else None
+                )
                 if owner and agent_name and agent_id:
                     self._agent_repository.upsert_agent(
                         owner=str(owner),
@@ -201,7 +255,9 @@ class AgentService:
                         agent_name=str(agent_name),
                         description=str(description),
                     )
-                    self._logger.info("本地Agent信息已保存 agent_id=%s owner=%s", agent_id, owner)
+                    self._logger.info(
+                        "本地Agent信息已保存 agent_id=%s owner=%s", agent_id, owner
+                    )
             elif path == "/acn-agent/v1/agent-deletions":
                 agent_id = body.get("agent_id")
                 if agent_id:
