@@ -48,11 +48,12 @@ class PipelineLogger:
         if not self._settings.enable_pipeline_log_push:
             return
 
-        webui_url = (
-            f"{self._settings.base_url(self._settings.webui_host, self._settings.webui_port)}"
-            "/acn/v3/pipeline-logs"
-        )
+        webui_url = f"{self._settings.webui_base_url()}/acn/v3/pipeline-logs"
         try:
-            await self._forwarder.post_json(webui_url, log_item.model_dump(mode="json"))
+            await self._forwarder.post_json(
+                webui_url,
+                log_item.model_dump(mode="json"),
+                verify_ssl=self._settings.webui_verify_ssl,
+            )
         except httpx.HTTPError as exc:
             self._logger.warning("推送流水日志到WebUI失败 error=%s", exc)

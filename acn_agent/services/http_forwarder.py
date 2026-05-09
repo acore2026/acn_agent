@@ -19,10 +19,16 @@ class HTTPForwarder:
         url: str,
         payload: dict[str, Any],
         headers: dict[str, str] | None = None,
+        verify_ssl: bool = True,
     ) -> httpx.Response:
         """POST JSON payload to an upstream service."""
         self._logger.info("开始转发请求到上游 url=%s body=%s", url, payload)
-        async with httpx.AsyncClient(timeout=self._timeout, transport=self._transport, trust_env=False) as client:
+        async with httpx.AsyncClient(
+            timeout=self._timeout,
+            transport=self._transport,
+            trust_env=False,
+            verify=verify_ssl,
+        ) as client:
             response = await client.post(url, json=payload, headers=headers)
         self._logger.info(
             "上游响应完成 url=%s status=%s body=%s",
